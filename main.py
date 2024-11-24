@@ -14,6 +14,19 @@ class Player:
         window.blit(self.texture,self.hitbox)
 
 
+    def move(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_RIGHT]:
+            self.hitbox.x += self.speed
+        if keys[pygame.K_DOWN]:
+            self.hitbox.y += self.speed
+        if keys[pygame.K_LEFT]:
+            self.hitbox.x -= self.speed
+        if keys[pygame.K_UP]:
+            self.hitbox.y -= self.speed
+
+
+
 class Wall:
     def __init__(self,width,height,x,y,color):
         self.hitbox = pygame.Rect(x,y,width,height)
@@ -24,6 +37,20 @@ class Wall:
 
 
 
+class Gold:
+    def __init__(self,width,height,x,y,skin):
+        self.texture = pygame.image.load(skin)
+        self.texture = pygame.transform.scale(self.texture, [width,height])
+        self.hitbox = self.texture.get_rect()
+        self.hitbox.x = x
+        self.hitbox.y = y
+
+    def draw(self,window):
+        window.blit(self.texture,self.hitbox)
+
+
+
+
 
 pygame.init()
 
@@ -31,8 +58,8 @@ pygame.init()
 
 window = pygame.display.set_mode([700,500])
 fps = pygame.time.Clock()
-player = Player(10,50,50,50,225,"hero.png")
-
+player = Player(5,50,50,50,225,"hero.png")
+gold = Gold(50,50,600,160,"treasure.png")
 background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, [700,500])
 game = True
@@ -64,6 +91,17 @@ while game:
     window.fill([255,0,0])
     window.blit(background,[0,0])
     player.draw(window)
+    gold.draw(window)
+
+    player.move()
+
+    for wall in walls:
+        if player.hitbox.colliderect(wall.hitbox):
+            player.hitbox.x = 50
+            player.hitbox.y = 225
+
+
+
     for wall in walls:
         wall.draw(window)
     pygame.display.flip()
