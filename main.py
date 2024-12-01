@@ -2,7 +2,7 @@ import pygame
 
 
 class Player:
-    def __init__(self,speed,width,height,x,y,skin):
+    def __init__(self, speed, width, height, x, y, skin):
         self.texture = pygame.image.load(skin)
         self.texture = pygame.transform.scale(self.texture, [width,height])
         self.hitbox = self.texture.get_rect()
@@ -25,6 +25,23 @@ class Player:
         if keys[pygame.K_UP]:
             self.hitbox.y -= self.speed
 
+class Enemy:
+    def __init__(self,width,height,x,y,skin):
+        self.texture = pygame.image.load(skin)
+        self.texture = pygame.transform.scale(self.texture, [width,height])
+        self.hitbox = self.texture.get_rect()
+        self.hitbox.x = x
+        self.hitbox.y = y
+
+
+
+    def draw(self,window):
+        window.blit(self.texture,self.hitbox)
+
+
+
+
+
 
 
 class Wall:
@@ -38,18 +55,41 @@ class Wall:
 
 
 class Gold:
-    def __init__(self,width,height,x,y,skin):
+    def __init__(self, width, height, x, y, skin):
         self.texture = pygame.image.load(skin)
-        self.texture = pygame.transform.scale(self.texture, [width,height])
+        self.texture = pygame.transform.scale(self.texture, [width, height])
         self.hitbox = self.texture.get_rect()
         self.hitbox.x = x
         self.hitbox.y = y
 
-    def draw(self,window):
-        window.blit(self.texture,self.hitbox)
+    def draw(self, window):
+        window.blit(self.texture, self.hitbox)
 
 
+def win_window(window):
+    fps = pygame.time.Clock()
+    win_lbl = pygame.font.Font(None, 48).render("Ти переміг",True, [255, 0,0])
+    while True:
+        window.fill([255, 255, 255])
+        window.blit(win_lbl, [200, 200])
+        pygame.display.flip()
 
+        fps.tick(60)
+
+def lose_window(window):
+    fps = pygame.time.Clock()
+    win_lbl = pygame.font.Font(None, 48).render("Ти програв",True, [255, 0,0])
+    while True:
+        window.fill([255, 255, 255])
+        window.blit(win_lbl, [200, 200])
+        pygame.display.flip()
+
+        fps.tick(60)
+
+
+pygame.mixer.init()
+pygame.mixer.music.load("jungles.ogg")
+pygame.mixer.music.play(-1)
 
 
 pygame.init()
@@ -59,6 +99,8 @@ pygame.init()
 window = pygame.display.set_mode([700,500])
 fps = pygame.time.Clock()
 player = Player(5,50,50,50,225,"hero.png")
+enemy = Enemy(50,50,380,330,"cyborg.png")
+enemy2 = Enemy(50,50,250,230,"cyborg.png")
 gold = Gold(50,50,600,160,"treasure.png")
 background = pygame.image.load("background.jpg")
 background = pygame.transform.scale(background, [700,500])
@@ -83,6 +125,11 @@ walls = [
 ]
 
 
+kick_sound = pygame.mixer.Sound("kick.ogg")
+gold_sound = pygame.mixer.Sound("money.ogg")
+
+
+
 while game:
     for event in pygame.event.get():
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -91,14 +138,33 @@ while game:
     window.fill([255,0,0])
     window.blit(background,[0,0])
     player.draw(window)
+    enemy.draw(window)
+    enemy2.draw(window)
     gold.draw(window)
 
     player.move()
 
     for wall in walls:
         if player.hitbox.colliderect(wall.hitbox):
+            kick_sound.play()
             player.hitbox.x = 50
             player.hitbox.y = 225
+
+    if player.hitbox.colliderect(gold.hitbox):
+        gold_sound.play()
+        win_window(window)
+
+    if player.hitbox.colliderect(enemy.hitbox):
+        lose_window(window)
+
+    if player.hitbox.colliderect(enemy2.hitbox):
+        lose_window(window)
+    window.fill([255, 0, 0])
+    window.blit(background, [0, 0])
+    player.draw(window)
+    gold.draw(window)
+    enemy.draw(window)
+    enemy2.draw(window)
 
 
 
@@ -106,4 +172,4 @@ while game:
         wall.draw(window)
     pygame.display.flip()
 
-    fps.tick((60))
+    fps.tick(60)
