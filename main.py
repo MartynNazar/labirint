@@ -78,10 +78,10 @@ def win_window(window):
 
 def lose_window(window):
     fps = pygame.time.Clock()
-    win_lbl = pygame.font.Font(None, 48).render("Ти програв",True, [255, 0,0])
+    lose_lbl = pygame.font.Font(None, 48).render("Ти програв",True, [255, 0,0])
     while True:
         window.fill([255, 255, 255])
-        window.blit(win_lbl, [200, 200])
+        window.blit(lose_lbl, [200, 200])
         pygame.display.flip()
 
         fps.tick(60)
